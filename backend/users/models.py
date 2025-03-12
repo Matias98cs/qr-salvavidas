@@ -27,7 +27,7 @@ class Phone(models.Model):
         (EMERGENCY, "Emergency"),
     ]
 
-    number = models.CharField(max_length=20)
+    number = models.CharField(max_length=20, unique=True)
     type = models.CharField(max_length=10, choices=PHONE_TYPE_CHOICES)
 
     def __str__(self):
@@ -38,7 +38,7 @@ class CustomUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email = models.EmailField(unique=True, blank=True, null=True)
     dni = models.CharField(max_length=20, unique=True)
-    birth_date = models.DateField()
+    birth_date = models.DateField(null=True, blank=True)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
     phones = models.ManyToManyField(Phone, blank=True)
 
