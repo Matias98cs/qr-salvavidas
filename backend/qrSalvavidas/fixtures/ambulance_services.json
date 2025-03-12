@@ -1,0 +1,37 @@
+[
+    {
+        "model": "qrSalvavidas.ambulanceservice",
+        "pk": 1,
+        "fields": {
+            "name": "Ecco"
+        }
+    },
+    {
+        "model": "qrSalvavidas.ambulanceservice",
+        "pk": 2,
+        "fields": {
+            "name": "Emi"
+        }
+    },
+    {
+        "model": "qrSalvavidas.ambulanceservice",
+        "pk": 3,
+        "fields": {
+            "name": "Urg"
+        }
+    },
+    {
+        "model": "qrSalvavidas.ambulanceservice",
+        "pk": 4,
+        "fields": {
+            "name": "Vittal"
+        }
+    },
+    {
+        "model": "qrSalvavidas.ambulanceservice",
+        "pk": 5,
+        "fields": {
+            "name": "Family"
+        }
+    }
+]
