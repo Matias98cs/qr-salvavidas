@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'qrSalvavidas',
     'users',
 ]
@@ -149,4 +150,11 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'SIGNING_KEY': SECRET_KEY,
     'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_COOKIE': 'access_token',  # Nombre de la cookie
+    'AUTH_COOKIE_REFRESH': 'refresh_token',  # Nombre del refresh token
+    'AUTH_COOKIE_SECURE': True,  # Solo se envía por HTTPS
+    'AUTH_COOKIE_HTTP_ONLY': False,  # No accesible por JavaScript
+    'AUTH_COOKIE_PATH': '/',  # Accesible en toda la aplicación
+    'AUTH_COOKIE_SAMESITE': 'Lax',  # Protección CSRF básica
+    'TOKEN_BLACKLIST': True,  # Activa el sistema de blacklist
 }
