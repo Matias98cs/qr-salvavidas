@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserProfileSerializer, PhoneSerializer
+from django.contrib.auth.models import User
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -49,12 +50,28 @@ def get_user_profile(request):
 def update_user_profile(request):
     custom_user, created = CustomUser.objects.get_or_create(user=request.user)
     data = request.data
+    errors = {}
+
+    if "email" in data:
+        existing_user = User.objects.filter(email=data["email"]).exclude(id=request.user.id).first()
+        if existing_user:
+            errors["email"] = "Este email ya está en uso por otro usuario."
+
+    if "dni" in data:
+        existing_dni = CustomUser.objects.filter(dni=data["dni"]).exclude(id=custom_user.id).first()
+        if existing_dni:
+            errors["dni"] = "Este DNI ya está en uso por otro usuario."
+
+    if errors:
+        return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
     if "email" in data:
         custom_user.email = data["email"]
         custom_user.user.email = data["email"]
+
     if "dni" in data:
         custom_user.dni = data["dni"]
+
     if "birth_date" in data:
         custom_user.birth_date = data["birth_date"]
     if "first_name" in data:
@@ -62,46 +79,14 @@ def update_user_profile(request):
     if "last_name" in data:
         custom_user.user.last_name = data["last_name"]
 
-    if "phones" in data:
-        current_phone_ids = set(custom_user.phones.values_list("id", flat=True))
-        updated_phone_ids = set()
-
-        new_phones = []
-        for phone_data in data["phones"]:
-            phone_id = phone_data.get("id")
-
-            if phone_id:
-                try:
-                    phone = Phone.objects.get(id=phone_id)
-                    phone.number = phone_data["number"]
-                    phone.type = phone_data["type"]
-                    phone.save()
-                    updated_phone_ids.add(phone.id)
-                except Phone.DoesNotExist:
-                    return Response({"error": f"El teléfono con ID {phone_id} no existe"}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                phone, created = Phone.objects.get_or_create(
-                    number=phone_data["number"],
-                    defaults={"type": phone_data["type"]}
-                )
-                if not created:
-                    phone.type = phone_data["type"]
-                    phone.save()
-                
-                updated_phone_ids.add(phone.id)
-
-            new_phones.append(phone)
-
-        phones_to_remove = current_phone_ids - updated_phone_ids
-        custom_user.phones.remove(*phones_to_remove)
-
-        custom_user.phones.set(new_phones)
 
     if "role" in data:
-        try:
-            custom_user.role = Role.objects.get(name=data["role"])
-        except Role.DoesNotExist:
-            return Response({"error": "El rol especificado no existe"}, status=status.HTTP_400_BAD_REQUEST)
+        if data["role"] == "admin":
+            custom_user.user.is_staff = True
+            custom_user.user.is_superuser = True
+        elif data["role"] == "user":
+            custom_user.user.is_staff = False
+            custom_user.user.is_superuser = False
 
     custom_user.user.save()
     custom_user.save()
