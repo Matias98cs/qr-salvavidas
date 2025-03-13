@@ -1,8 +1,18 @@
-.env*
-.venv*
-
-
-# Ignorar archivos compilados de Python
+# Archivos de Python compilados
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+
+# Entornos virtuales
+venv/
+.env
+.venv
+
+# Archivos de migraciones innecesarias
+migrations/**/__pycache__/
+migrations/*.pyc
+migrations/*_initial.py  # Opcional, si quieres ignorar migraciones iniciales innecesarias
+
+# Configuración sensible
+# myproyect/settings.py
