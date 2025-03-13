@@ -9,6 +9,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserProfileSerializer, PhoneSerializer
 from django.contrib.auth.models import User
+from django_countries.fields import Country
+from django_countries import countries
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -62,6 +64,37 @@ def update_user_profile(request):
         if existing_dni:
             errors["dni"] = "Este DNI ya está en uso por otro usuario."
 
+    if "country" in data and data["country"] not in dict(countries):
+        errors["country"] = "País inválido. Debe ser un código ISO 3166-1 válido."
+
+    if "nationality" in data and data["nationality"] not in dict(countries):
+        errors["nationality"] = "Nacionalidad inválida. Debe ser un código ISO 3166-1 válido."
+
+    if "phones" in data:
+        phone_numbers = set()
+        for phone_data in data["phones"]:
+            phone_id = phone_data.get("id")
+            country_code = phone_data.get("country_code", "").strip()
+            area_code = phone_data.get("area_code", "").strip()
+            phone_number = phone_data.get("phone_number", "").strip()
+
+            if not country_code or not area_code or not phone_number:
+                errors["phones"] = "Todos los campos del teléfono (country_code, area_code, phone_number) son obligatorios."
+
+            existing_phone = Phone.objects.filter(
+                country_code=country_code,
+                area_code=area_code,
+                phone_number=phone_number
+            ).exclude(user=custom_user).first()
+
+            if existing_phone:
+                errors["phones"] = f"El número {country_code} {area_code} {phone_number} ya está en uso por otro usuario."
+
+            phone_key = (country_code, area_code, phone_number)
+            if phone_key in phone_numbers:
+                errors["phones"] = f"El número {country_code} {area_code} {phone_number} está duplicado en la solicitud."
+            phone_numbers.add(phone_key)
+
     if errors:
         return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -74,11 +107,21 @@ def update_user_profile(request):
 
     if "birth_date" in data:
         custom_user.birth_date = data["birth_date"]
+
     if "first_name" in data:
         custom_user.user.first_name = data["first_name"]
+
     if "last_name" in data:
         custom_user.user.last_name = data["last_name"]
 
+    if "country" in data:
+        custom_user.country = data["country"]
+
+    if "nationality" in data:
+        custom_user.nationality = data["nationality"]
+
+    if "province" in data:
+        custom_user.province = data["province"]
 
     if "role" in data:
         if data["role"] == "admin":
@@ -87,6 +130,44 @@ def update_user_profile(request):
         elif data["role"] == "user":
             custom_user.user.is_staff = False
             custom_user.user.is_superuser = False
+
+    if "phones" in data:
+        existing_phone_ids = set(custom_user.phones.values_list("id", flat=True))
+        updated_phone_ids = set()
+
+        for phone_data in data["phones"]:
+            phone_id = phone_data.get("id")
+            country_code = phone_data["country_code"].strip()
+            area_code = phone_data["area_code"].strip()
+            phone_number = phone_data["phone_number"].strip()
+            phone_type = phone_data["type"]
+
+            if phone_id:
+                try:
+                    phone = Phone.objects.get(id=phone_id, user=custom_user)
+                    phone.country_code = country_code
+                    phone.area_code = area_code
+                    phone.phone_number = phone_number
+                    phone.type = phone_type
+                    phone.save()
+                    updated_phone_ids.add(phone.id)
+                except Phone.DoesNotExist:
+                    errors["phones"] = f"El teléfono con ID {phone_id} no existe."
+            else:
+                phone, created = Phone.objects.get_or_create(
+                    user=custom_user,
+                    country_code=country_code,
+                    area_code=area_code,
+                    phone_number=phone_number,
+                    defaults={"type": phone_type}
+                )
+                if not created:
+                    phone.type = phone_type
+                    phone.save()
+                updated_phone_ids.add(phone.id)
+
+        phones_to_remove = existing_phone_ids - updated_phone_ids
+        Phone.objects.filter(id__in=phones_to_remove).delete()
 
     custom_user.user.save()
     custom_user.save()

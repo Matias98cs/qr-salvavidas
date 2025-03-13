@@ -43,7 +43,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 class PhoneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Phone
-        fields = ['id', 'number', 'type']
+        fields = ["id", "country_code", "area_code", "phone_number", "type"]
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -54,4 +54,4 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'dni', 'birth_date', 'role', 'first_name', 'last_name', 'phones']
+        fields = ['email', 'dni', 'birth_date', 'role', 'first_name', 'last_name', 'phones', 'country', 'province', 'nationality']
