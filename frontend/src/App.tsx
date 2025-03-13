@@ -1,18 +1,18 @@
-import { Button } from "@/components/ui/button";
-import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
 
-function App() {
+export default function App() {
   return (
-    <div>
-      <h1 className="text-center text-3xl font-bold">Hello, Tailwind CSS!</h1>
-      <p className="text-center">
-        This is a simple example using Tailwind CSS.
-      </p>
-      <div className="flex flex-col items-center justify-center min-h-svh">
-        <Button className="cursor-pointer">Click me</Button>
-      </div>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Home />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 }
-
-export default App;
