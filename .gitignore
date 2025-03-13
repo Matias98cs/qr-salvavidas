@@ -1,18 +1,27 @@
-# Archivos de Python compilados
+# 🔹 Ignorar archivos innecesarios de Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Entornos virtuales
-venv/
-.env
-.venv
+# 🔹 Ignorar migraciones compiladas en backend
+backend/**/migrations/__pycache__/
+backend/**/migrations/*.pyc
 
-# Archivos de migraciones innecesarias
-migrations/**/__pycache__/
-migrations/*.pyc
-migrations/*_initial.py  # Opcional, si quieres ignorar migraciones iniciales innecesarias
+# 🔹 Ignorar entornos virtuales y configuración local en backend
+backend/venv/
+backend/.env
+backend/.venv
 
-# Configuración sensible
-# myproyect/settings.py
+# 🔹 Ignorar archivos innecesarios en frontend
+frontend/node_modules/
+frontend/.env
+frontend/.next/
+frontend/.nuxt/
+frontend/dist/
+frontend/build/
+
+# 🔹 Ignorar dependencias globales y configuraciones del sistema
+.DS_Store
+.idea/
+.vscode/
