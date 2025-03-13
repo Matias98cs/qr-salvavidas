@@ -123,13 +123,18 @@ def update_user_profile(request):
     if "province" in data:
         custom_user.province = data["province"]
 
+    if "read_qr" in data:
+        custom_user.read_qr = bool(data["read_qr"])
+
     if "role" in data:
         if data["role"] == "admin":
             custom_user.user.is_staff = True
             custom_user.user.is_superuser = True
+            custom_user.role = Role.objects.get(name="admin")
         elif data["role"] == "user":
             custom_user.user.is_staff = False
             custom_user.user.is_superuser = False
+            custom_user.role = Role.objects.get(name="user")
 
     if "phones" in data:
         existing_phone_ids = set(custom_user.phones.values_list("id", flat=True))

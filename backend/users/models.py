@@ -51,6 +51,7 @@ class CustomUser(models.Model):
     country = CountryField(blank=True, null=True)  # 🔹 Usa django-countries para países válidos
     province = models.CharField(max_length=100, blank=True, null=True)  # 🔹 Provincia/Estado
     nationality = CountryField(blank=True, null=True, verbose_name="Nationality")  # 🔹 Nacionalidad del usuario
+    read_qr = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.get_full_name()
