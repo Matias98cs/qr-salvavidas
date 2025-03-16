@@ -12,9 +12,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { authLogin } from "@/services/auth/auth.service";
+// import { authLogin } from "@/services/auth/auth.service";
+import { useAuthStore } from "@/presentations/auth/store/useAuthStore";
 
 export default function Login() {
+  const {login} = useAuthStore();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -36,8 +38,7 @@ export default function Login() {
     }
 
     try {
-      const response =  await authLogin(formData.emailOrUsername, formData.password);
-      console.log(response)
+      await login(formData.emailOrUsername, formData.password);
       navigate("/");
     } catch (error) {
       alert("Error al iniciar sesión: " + error);

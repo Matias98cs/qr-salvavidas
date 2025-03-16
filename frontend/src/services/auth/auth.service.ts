@@ -31,16 +31,29 @@ export const authLogin = async (username: string, password: string): Promise<Aut
  * @returns AuthRefreshResponse
  */
 export const authRefresh = async (refreshToken: string): Promise<AuthRefreshResponse> => {
+    if (!refreshToken) {
+        console.warn("No hay refresh token válido.");
+        throw new Error("No se encontró un refresh token válido.");
+    }
+
     try {
         const { data } = await https.post<AuthRefreshResponse>("/auth/token/refresh/", { refresh: refreshToken });
 
-        localStorage.setItem("access", data.access);
+        if (!data.access) {
+            throw new Error("El servidor no devolvió un nuevo token.");
+        }
 
+        localStorage.setItem("access", data.access);
+        localStorage.setItem("refresh", data.refresh);
         return data;
     } catch (error) {
+        console.error("Error al refrescar el token:", error);
+        
         const axiosError = error as AxiosError<{ detail?: string }>;
+        const errorMessage = axiosError.response?.data?.detail || "Error al refrescar la sesión.";
 
-        const errorMessage = axiosError.response?.data?.detail || "No se pudo refrescar el token.";
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
 
         throw new Error(errorMessage);
     }
