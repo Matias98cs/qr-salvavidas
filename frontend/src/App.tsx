@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Loading from "./components/Loading";
+import PublicRoute from "./routes/PublicRoutes";
 
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
@@ -15,7 +16,10 @@ export default function App() {
     <Router>
       <Suspense fallback={<Loading />}>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route element={<PublicRoute />}>
+            <Route path="/login" element={<Login />} />
+            {/* <Route path="/register" element={<Register />} /> */}
+          </Route>
 
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Home />} />

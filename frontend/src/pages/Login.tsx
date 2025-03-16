@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/presentations/auth/store/useAuthStore";
 
 export default function Login() {
-  const {login} = useAuthStore();
+  const { login } = useAuthStore();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
