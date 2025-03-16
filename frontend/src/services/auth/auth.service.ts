@@ -48,7 +48,7 @@ export const authRefresh = async (refreshToken: string): Promise<AuthRefreshResp
         return data;
     } catch (error) {
         console.error("Error al refrescar el token:", error);
-        
+
         const axiosError = error as AxiosError<{ detail?: string }>;
         const errorMessage = axiosError.response?.data?.detail || "Error al refrescar la sesión.";
 
@@ -93,7 +93,21 @@ export const authProfile = async (): Promise<AuthProfileResponse> => {
         return data;
     } catch (error) {
         console.error("Error al obtener el perfil:", error);
-        
+
+        const axiosError = error as AxiosError<{ detail?: string }>;
+        const errorMessage = axiosError.response?.data?.detail || "Error de conexión con el servidor.";
+
+        throw new Error(errorMessage);
+    }
+}
+
+
+export const authChangeProfileData = async (profileData: AuthProfileResponse): Promise<void> => {
+    try {
+        await https.put("/auth/profile/update/", profileData);
+    } catch (error) {
+        console.error("Error al actualizar los datos del perfil:", error);
+
         const axiosError = error as AxiosError<{ detail?: string }>;
         const errorMessage = axiosError.response?.data?.detail || "Error de conexión con el servidor.";
 

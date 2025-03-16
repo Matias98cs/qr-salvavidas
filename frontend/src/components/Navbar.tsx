@@ -60,11 +60,11 @@ export default function Navbar() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
             className="rounded-full cursor-pointer"
           >
-            <User className="h-5 w-5" />
+            <User className="h-5 w-5" color="#252525" />
             <span className="sr-only">Menú de usuario</span>
           </Button>
         </DropdownMenuTrigger>

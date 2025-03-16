@@ -24,11 +24,12 @@ export interface AuthRefreshResponse {
 
 
 export interface AuthProfileResponse {
+    id?: number;
     email: string;
     dni: string;
     birth_date: string;
-    read_qr: boolean;
-    role: string;
+    read_qr: boolean | number;
+    role?: string;
     first_name: string;
     last_name: string;
     phones: Phone[];
@@ -38,7 +39,7 @@ export interface AuthProfileResponse {
 }
 
 export interface Phone {
-    id: number;
+    id?: number;
     country_code: string;
     area_code: string;
     phone_number: string;

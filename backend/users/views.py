@@ -131,7 +131,8 @@ def update_user_profile(request):
             phone_numbers.add(phone_key)
 
     if errors:
-        return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
+
 
     if "email" in data:
         custom_user.email = data["email"]

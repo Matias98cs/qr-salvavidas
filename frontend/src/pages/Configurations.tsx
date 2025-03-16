@@ -20,18 +20,16 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import {
-  Errors,
-  Phone,
-  PhoneType,
-  UserData,
-} from "@/interfaces/user.interface";
+import { Errors, PhoneType, UserData } from "@/interfaces/user.interface";
 import { countries } from "@/helpers/countries";
 import useAuthProfile from "@/presentations/auth/hooks/useAuthProfile";
 import { useAuthStore } from "@/presentations/auth/store/useAuthStore";
+import useUpdateAuthProfile from "@/presentations/auth/hooks/useUpdateAuthProfile";
+import { Phone } from "@/interfaces/auth.interface";
 
 export default function Configurations() {
   const { userProfile, setProfile } = useAuthStore();
+  const { mutateAsync: updateProfile } = useUpdateAuthProfile();
   const { data: userProfileQuery, isLoading, error } = useAuthProfile();
 
   const [userData, setUserData] = useState<UserData>({
@@ -128,7 +126,7 @@ export default function Configurations() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const newErrors: Errors = {};
@@ -151,9 +149,17 @@ export default function Configurations() {
 
     setErrors(newErrors);
 
-    if (Object.keys(newErrors).length === 0) {
-      console.log("Datos enviados:", { ...userData, phones });
-      alert("Datos guardados correctamente");
+    if (Object.keys(newErrors).length > 0) return;
+
+    try {
+      console.log("Enviando datos al backend:", { ...userData, phones });
+
+      await updateProfile({ ...userData, phones });
+
+      alert("Perfil actualizado correctamente");
+    } catch (error) {
+      console.error("Error al actualizar el perfil:", error);
+      alert("Error al actualizar el perfil, intenta nuevamente.");
     }
   };
 
