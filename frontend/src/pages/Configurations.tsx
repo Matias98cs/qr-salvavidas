@@ -24,12 +24,11 @@ import { Errors, PhoneType, UserData } from "@/interfaces/user.interface";
 import { countries } from "@/helpers/countries";
 import useAuthProfile from "@/presentations/auth/hooks/useAuthProfile";
 import { useAuthStore } from "@/presentations/auth/store/useAuthStore";
-import useUpdateAuthProfile from "@/presentations/auth/hooks/useUpdateAuthProfile";
 import { Phone } from "@/interfaces/auth.interface";
+import { authChangeProfileData } from "@/services/auth/auth.service";
 
 export default function Configurations() {
   const { userProfile, setProfile } = useAuthStore();
-  const { mutateAsync: updateProfile } = useUpdateAuthProfile();
   const { data: userProfileQuery, isLoading, error } = useAuthProfile();
 
   const [userData, setUserData] = useState<UserData>({
@@ -110,8 +109,8 @@ export default function Configurations() {
     setPhones([
       ...phones,
       {
-        country_code: "",
-        area_code: "",
+        country_code: "+54",
+        area_code: "351",
         phone_number: "",
         type: "personal",
       },
@@ -128,40 +127,43 @@ export default function Configurations() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     const newErrors: Errors = {};
-
+  
     if (!userData.email || !userData.email.includes("@")) {
       newErrors.email = "Email inválido";
     }
-
+  
     if (!userData.dni || userData.dni.length < 7) {
       newErrors.dni = "DNI inválido";
     }
-
+  
     if (!userData.first_name) {
       newErrors.first_name = "Nombre requerido";
     }
-
+  
     if (!userData.last_name) {
       newErrors.last_name = "Apellido requerido";
     }
-
+  
     setErrors(newErrors);
+  
 
-    if (Object.keys(newErrors).length > 0) return;
-
-    try {
-      console.log("Enviando datos al backend:", { ...userData, phones });
-
-      await updateProfile({ ...userData, phones });
-
-      alert("Perfil actualizado correctamente");
-    } catch (error) {
-      console.error("Error al actualizar el perfil:", error);
-      alert("Error al actualizar el perfil, intenta nuevamente.");
+    if (Object.keys(newErrors).length === 0) {
+      try {
+        await authChangeProfileData({ ...userData, phones });
+        alert("Datos guardados correctamente");
+      } catch (error) {
+  
+        if (error && typeof error === "object" && "errors" in error) {
+          setErrors(error.errors as Errors);
+        } else {
+          alert("Ocurrió un error desconocido al actualizar el perfil.");
+        }
+      }
     }
   };
+
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -175,7 +177,6 @@ export default function Configurations() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Información básica */}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -361,8 +362,14 @@ export default function Configurations() {
                   <Plus className="h-4 w-4 mr-2" /> Agregar teléfono
                 </Button>
               </div>
-
               <Separator />
+
+              {
+                errors.phones && (
+                  <p className="text-red-500 text-sm">{errors.phones}</p>
+
+                )
+              }
 
               {phones.length > 0 ? (
                 phones.map((phone, index) => (

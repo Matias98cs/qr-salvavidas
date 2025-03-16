@@ -114,7 +114,7 @@ def update_user_profile(request):
             phone_number = phone_data.get("phone_number", "").strip()
 
             if not country_code or not area_code or not phone_number:
-                errors["phones"] = "Todos los campos del teléfono (country_code, area_code, phone_number) son obligatorios."
+                errors["phones"] = "Todos los campos del teléfono (Código país, Código área, Número) son obligatorios."
 
             existing_phone = Phone.objects.filter(
                 country_code=country_code,

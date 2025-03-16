@@ -106,11 +106,12 @@ export const authChangeProfileData = async (profileData: AuthProfileResponse): P
     try {
         await https.put("/auth/profile/update/", profileData);
     } catch (error) {
-        console.error("Error al actualizar los datos del perfil:", error);
+        const axiosError = error as AxiosError<{ errors?: Record<string, string> }>;
 
-        const axiosError = error as AxiosError<{ detail?: string }>;
-        const errorMessage = axiosError.response?.data?.detail || "Error de conexión con el servidor.";
+        if (axiosError.response?.data?.errors) {
+            throw axiosError.response.data;
+        }
 
-        throw new Error(errorMessage);
+        throw new Error("Error de conexión con el servidor.");
     }
-}
+};
