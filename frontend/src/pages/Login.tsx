@@ -1,8 +1,6 @@
 import type React from "react";
-
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
+import { authLogin } from "@/services/auth/auth.service";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -28,11 +27,21 @@ export default function Login() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí iría la lógica para procesar el inicio de sesión
-    console.log("Datos de inicio de sesión:", formData);
-    navigate("/");
+
+    if (!formData.emailOrUsername || !formData.password) {
+      alert("Todos los campos son obligatorios");
+      return;
+    }
+
+    try {
+      const response =  await authLogin(formData.emailOrUsername, formData.password);
+      console.log(response)
+      navigate("/");
+    } catch (error) {
+      alert("Error al iniciar sesión: " + error);
+    }
   };
 
   const togglePasswordVisibility = () => {

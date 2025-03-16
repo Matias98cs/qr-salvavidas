@@ -36,6 +36,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,6 +60,7 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -144,6 +146,9 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+CORS_ALLOW_ALL_ORIGINS = True  # Para desarrollo, en producción especifica los dominios permitidos
+CORS_ALLOW_CREDENTIALS = True
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
@@ -153,8 +158,8 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_COOKIE': 'access_token',  # Nombre de la cookie
     'AUTH_COOKIE_REFRESH': 'refresh_token',  # Nombre del refresh token
-    'AUTH_COOKIE_SECURE': True,  # Solo se envía por HTTPS
-    'AUTH_COOKIE_HTTP_ONLY': False,  # No accesible por JavaScript
+    'AUTH_COOKIE_SECURE': False,  # Solo se envía por HTTPS ♦︎ (DEV) = False (PROD) = True
+    'AUTH_COOKIE_HTTP_ONLY': True,  # No accesible por JavaScript
     'AUTH_COOKIE_PATH': '/',  # Accesible en toda la aplicación
     'AUTH_COOKIE_SAMESITE': 'Lax',  # Protección CSRF básica
     'TOKEN_BLACKLIST': True,  # Activa el sistema de blacklist

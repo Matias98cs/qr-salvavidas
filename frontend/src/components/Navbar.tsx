@@ -11,11 +11,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { authLogout } from "@/services/auth/auth.service";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const handleLogout = () => {
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await authLogout();
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    } finally {
+      navigate("/login", { replace: true });
+    }
   };
 
   return (
@@ -51,7 +58,11 @@ export default function Navbar() {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="rounded-full cursor-pointer">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full cursor-pointer"
+          >
             <User className="h-5 w-5" />
             <span className="sr-only">Menú de usuario</span>
           </Button>
