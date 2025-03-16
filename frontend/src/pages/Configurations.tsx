@@ -1,5 +1,5 @@
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,30 +27,39 @@ import {
   UserData,
 } from "@/interfaces/user.interface";
 import { countries } from "@/helpers/countries";
+import useAuthProfile from "@/presentations/auth/hooks/useAuthProfile";
+import { useAuthStore } from "@/presentations/auth/store/useAuthStore";
 
 export default function Configurations() {
+  const { userProfile, setProfile } = useAuthStore();
+  const { data: userProfileQuery, isLoading, error } = useAuthProfile();
+
   const [userData, setUserData] = useState<UserData>({
-    email: "",
-    dni: "",
-    birth_date: "",
-    first_name: "",
-    last_name: "",
-    country: "",
-    nationality: "",
-    province: "",
-    read_qr: 0,
+    email: userProfile?.email ?? "",
+    dni: userProfile?.dni ?? "",
+    birth_date: userProfile?.birth_date ?? "",
+    first_name: userProfile?.first_name ?? "",
+    last_name: userProfile?.last_name ?? "",
+    country: userProfile?.country ?? "",
+    nationality: userProfile?.nationality ?? "",
+    province: userProfile?.province ?? "",
+    read_qr: userProfile?.read_qr ? 1 : 0,
   });
 
-  const [phones, setPhones] = useState<Phone[]>([
-    {
-      country_code: "",
-      area_code: "",
-      phone_number: "",
-      type: "personal",
-    },
-  ]);
+  const [phones, setPhones] = useState<Phone[]>(userProfile?.phones ?? []);
 
   const [errors, setErrors] = useState<Errors>({});
+
+  useEffect(() => {
+    if (userProfileQuery) {
+      setUserData(userProfileQuery);
+      setProfile(userProfileQuery);
+      setPhones(userProfileQuery.phones);
+    }
+  }, [userProfileQuery, userProfile, setProfile]);
+
+  if (isLoading) return <p>Cargando perfil...</p>;
+  if (error) return <p>Error al cargar el perfil: {error.message}</p>;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -166,7 +175,7 @@ export default function Configurations() {
                 <Input
                   id="email"
                   name="email"
-                  value={userData.email}
+                  value={userData.email ?? ""}
                   onChange={handleInputChange}
                   className={errors.email ? "border-red-500" : ""}
                 />
@@ -180,7 +189,7 @@ export default function Configurations() {
                 <Input
                   id="dni"
                   name="dni"
-                  value={userData.dni}
+                  value={userData.dni ?? ""}
                   onChange={handleInputChange}
                   className={errors.dni ? "border-red-500" : ""}
                 />
@@ -194,7 +203,7 @@ export default function Configurations() {
                 <Input
                   id="first_name"
                   name="first_name"
-                  value={userData.first_name}
+                  value={userData.first_name ?? ""}
                   onChange={handleInputChange}
                   className={errors.first_name ? "border-red-500" : ""}
                 />
@@ -208,7 +217,7 @@ export default function Configurations() {
                 <Input
                   id="last_name"
                   name="last_name"
-                  value={userData.last_name}
+                  value={userData.last_name ?? ""}
                   onChange={handleInputChange}
                   className={errors.last_name ? "border-red-500" : ""}
                 />
@@ -223,7 +232,7 @@ export default function Configurations() {
                   id="birth_date"
                   name="birth_date"
                   type="date"
-                  value={userData.birth_date}
+                  value={userData.birth_date ?? ""}
                   onChange={handleInputChange}
                   className={errors.birth_date ? "border-red-500" : ""}
                 />
@@ -257,7 +266,7 @@ export default function Configurations() {
               <div className="space-y-2">
                 <Label htmlFor="country">País</Label>
                 <Select
-                  value={userData.country}
+                  value={userData.country ?? ""}
                   onValueChange={(value) =>
                     handleSelectChange("country", value)
                   }
@@ -269,7 +278,7 @@ export default function Configurations() {
                   </SelectTrigger>
                   <SelectContent>
                     {countries.map((country) => (
-                      <SelectItem key={country.code} value={country.code}>
+                      <SelectItem key={country.code} value={country.code ?? ""}>
                         {country.name} ({country.code})
                       </SelectItem>
                     ))}
@@ -283,7 +292,7 @@ export default function Configurations() {
               <div className="space-y-2">
                 <Label htmlFor="nationality">Nacionalidad</Label>
                 <Select
-                  value={userData.nationality}
+                  value={userData.nationality ?? ""}
                   onValueChange={(value) =>
                     handleSelectChange("nationality", value)
                   }
@@ -295,7 +304,7 @@ export default function Configurations() {
                   </SelectTrigger>
                   <SelectContent>
                     {countries.map((country) => (
-                      <SelectItem key={country.code} value={country.code}>
+                      <SelectItem key={country.code} value={country.code ?? ""}>
                         {country.name} ({country.code})
                       </SelectItem>
                     ))}
@@ -311,7 +320,7 @@ export default function Configurations() {
                 <Input
                   id="province"
                   name="province"
-                  value={userData.province}
+                  value={userData.province ?? ""}
                   onChange={handleInputChange}
                   className={errors.province ? "border-red-500" : ""}
                 />
@@ -349,75 +358,89 @@ export default function Configurations() {
 
               <Separator />
 
-              {phones.map((phone, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end p-4 border rounded-md"
-                >
-                  <div className="flex flex-col gap-2">
-                    <Label>Código país</Label>
-                    <Input
-                      value={phone.country_code}
-                      onChange={(e) =>
-                        handlePhoneChange(index, "country_code", e.target.value)
-                      }
-                      placeholder="+54"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <Label>Código área</Label>
-                    <Input
-                      value={phone.area_code}
-                      onChange={(e) =>
-                        handlePhoneChange(index, "area_code", e.target.value)
-                      }
-                      placeholder="351"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <Label>Número</Label>
-                    <Input
-                      value={phone.phone_number}
-                      onChange={(e) =>
-                        handlePhoneChange(index, "phone_number", e.target.value)
-                      }
-                      placeholder="7363237"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <Label>Tipo</Label>
-                    <Select
-                      value={phone.type}
-                      onValueChange={(value) =>
-                        handlePhoneChange(index, "type", value as PhoneType)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="personal">Personal</SelectItem>
-                        <SelectItem value="work">Trabajo</SelectItem>
-                        <SelectItem value="emergency">Emergencia</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => removePhone(index)}
-                    disabled={phones.length <= 1}
-                    className="cursor-pointer"
+              {phones.length > 0 ? (
+                phones.map((phone, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end p-4 border rounded-md"
                   >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+                    <div className="flex flex-col gap-2">
+                      <Label>Código país</Label>
+                      <Input
+                        value={phone.country_code ?? ""}
+                        onChange={(e) =>
+                          handlePhoneChange(
+                            index,
+                            "country_code",
+                            e.target.value
+                          )
+                        }
+                        placeholder="+54"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <Label>Código área</Label>
+                      <Input
+                        value={phone.area_code ?? ""}
+                        onChange={(e) =>
+                          handlePhoneChange(index, "area_code", e.target.value)
+                        }
+                        placeholder="351"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <Label>Número</Label>
+                      <Input
+                        value={phone.phone_number}
+                        onChange={(e) =>
+                          handlePhoneChange(
+                            index,
+                            "phone_number",
+                            e.target.value
+                          )
+                        }
+                        placeholder="7363237"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <Label>Tipo</Label>
+                      <Select
+                        value={phone.type ?? ""}
+                        onValueChange={(value) =>
+                          handlePhoneChange(index, "type", value as PhoneType)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Tipo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="personal">Personal</SelectItem>
+                          <SelectItem value="work">Trabajo</SelectItem>
+                          <SelectItem value="emergency">Emergencia</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => removePhone(index)}
+                      disabled={phones.length <= 1}
+                      className="cursor-pointer"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">
+                  No hay teléfonos agregados
+                </p>
+              )}
             </div>
 
             <div className="flex justify-end">

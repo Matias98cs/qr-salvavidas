@@ -1,11 +1,7 @@
 import { useAuthStore } from "@/presentations/auth/store/useAuthStore";
 
 export default function Home() {
-  const { user, status } = useAuthStore();
-
-  console.log(`Status: ${status} `);
-  console.log(user);
-
+  const { user } = useAuthStore();
   return (
     <div className="flex flex-col items-center justify-center pt-6">
       <h1 className="text-3xl font-bold">🏠 Hola {user?.first_name}</h1>

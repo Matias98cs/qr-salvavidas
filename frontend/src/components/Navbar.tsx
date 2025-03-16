@@ -11,13 +11,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
-import { authLogout } from "@/services/auth/auth.service";
+import { useAuthStore } from "@/presentations/auth/store/useAuthStore";
 
 export default function Navbar() {
+  const { logout } = useAuthStore();
   const navigate = useNavigate();
   const handleLogout = async () => {
     try {
-      await authLogout();
+      await logout();
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
     } finally {

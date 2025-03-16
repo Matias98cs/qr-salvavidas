@@ -1,5 +1,5 @@
 import { https } from "@/config/axios.api";
-import { AuthRefreshResponse, AuthResponse } from "@/interfaces/auth.interface";
+import { AuthProfileResponse, AuthRefreshResponse, AuthResponse } from "@/interfaces/auth.interface";
 import { AxiosError } from "axios";
 
 /**
@@ -85,3 +85,18 @@ export const authLogout = async (): Promise<void> => {
         localStorage.removeItem("refresh");
     }
 };
+
+
+export const authProfile = async (): Promise<AuthProfileResponse> => {
+    try {
+        const { data } = await https.get<AuthProfileResponse>("/auth/profile");
+        return data;
+    } catch (error) {
+        console.error("Error al obtener el perfil:", error);
+        
+        const axiosError = error as AxiosError<{ detail?: string }>;
+        const errorMessage = axiosError.response?.data?.detail || "Error de conexión con el servidor.";
+
+        throw new Error(errorMessage);
+    }
+}

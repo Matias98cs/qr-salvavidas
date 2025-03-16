@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { authLogin, authLogout, authRefresh } from "@/services/auth/auth.service";
-import { AuthResponse, User } from "@/interfaces/auth.interface";
+import { authLogin, authLogout, authProfile, authRefresh } from "@/services/auth/auth.service";
+import { AuthProfileResponse, AuthResponse, User } from "@/interfaces/auth.interface";
 
 export type AuthStatus = "authenticated" | "unauthenticated" | "checking";
 
@@ -9,11 +9,14 @@ interface AuthState {
     token?: string;
     user?: User;
     password?: string;
+    userProfile: AuthProfileResponse | null;
 
     login: (email: string, password: string) => Promise<boolean>;
     logout: () => Promise<void>;
     checkStatus: () => Promise<void>;
     changeStatus: (token?: string, user?: User) => void;
+    fetchUserProfile: () => Promise<void>;
+    setProfile: (profileData: AuthProfileResponse) => Promise<void>;
     resetState: () => void;
 }
 
@@ -22,6 +25,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     token: undefined,
     user: undefined,
     password: undefined,
+    userProfile: null,
 
     changeStatus: (token, user) => {
         if (!token || !user) {
@@ -72,8 +76,22 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         }
     },
 
+    fetchUserProfile: async () => {
+        try {
+            const profile = await authProfile();
+            set({ userProfile: profile });
+        } catch (error) {
+            console.error("Error al obtener el perfil:", error);
+            set({ userProfile: undefined });
+        }
+    },
+
+    setProfile: async (profileData: AuthProfileResponse) => {
+        set({ userProfile: profileData });
+    },
+
     resetState: () => {
-        set({ status: "unauthenticated", token: undefined, user: undefined });
+        set({ status: "unauthenticated", token: undefined, user: undefined, userProfile: null });
         localStorage.removeItem("access");
         localStorage.removeItem("refresh");
     },
