@@ -163,4 +163,6 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_PATH': '/',  # Accesible en toda la aplicación
     'AUTH_COOKIE_SAMESITE': 'Lax',  # Protección CSRF básica
     'TOKEN_BLACKLIST': True,  # Activa el sistema de blacklist
+    'USER_ID_FIELD': 'id',  # 🔹 Asegurar que el token usa `id` del usuario
+    'USER_ID_CLAIM': 'user_id',  # 🔹 Lo que usamos en `refresh["user_id"]`
 }

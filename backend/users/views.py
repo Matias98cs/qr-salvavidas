@@ -1,4 +1,4 @@
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .serializers import CustomTokenObtainPairSerializer
 from .models import CustomUser, Phone, Role
 from rest_framework.decorators import api_view, permission_classes
@@ -11,9 +11,44 @@ from .serializers import UserProfileSerializer, PhoneSerializer
 from django.contrib.auth.models import User
 from django_countries.fields import Country
 from django_countries import countries
+import jwt
+from django.conf import settings
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+class CustomTokenRefreshView(TokenRefreshView):
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+
+        if response.status_code == 200:
+            refresh_token = request.data.get("refresh")
+
+            if not refresh_token:
+                return Response({"detail": "Refresh token no proporcionado"}, status=400)
+
+            try:
+                decoded_token = jwt.decode(refresh_token, settings.SECRET_KEY, algorithms=["HS256"])
+
+                user_id = decoded_token.get("user_id")
+                if not user_id:
+                    return Response({"detail": "No se encontró user_id en el token"}, status=400)
+
+                user = CustomUser.objects.get(id=user_id)
+                response.data["user"] = UserProfileSerializer(user).data
+
+            except jwt.ExpiredSignatureError:
+                return Response({"detail": "El token ha expirado"}, status=401)
+            except jwt.InvalidTokenError:
+                return Response({"detail": "Token inválido"}, status=401)
+            except CustomUser.DoesNotExist:
+                return Response({"detail": "Usuario no encontrado"}, status=404)
+            except Exception as e:
+                print("❌ Error en CustomTokenRefreshView:", str(e))
+                return Response({"detail": "No se pudo recuperar el usuario"}, status=400)
+
+        return response
 
 
 @api_view(['POST'])

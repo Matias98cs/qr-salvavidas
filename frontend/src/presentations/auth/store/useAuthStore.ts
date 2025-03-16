@@ -65,7 +65,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
         try {
             const response = await authRefresh(refreshToken);
-            set({ token: response.access, status: "authenticated" });
+            set({ token: response.access, status: "authenticated", user: response.user });
         } catch (error) {
             console.error("Error al refrescar el token:", error);
             set({ status: "unauthenticated", token: undefined, user: undefined });
