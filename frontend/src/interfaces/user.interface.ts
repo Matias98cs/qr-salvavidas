@@ -1,13 +1,5 @@
 export type PhoneType = "personal" | "work" | "emergency";
 
-export interface Phone {
-  id?: number;
-  country_code: string;
-  area_code: string;
-  phone_number: string;
-  type: PhoneType;
-}
-
 export interface UserData {
   email: string;
   dni: string;

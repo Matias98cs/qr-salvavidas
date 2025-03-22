@@ -35,6 +35,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             'role': custom_user.role.name if custom_user.role else None,
             'first_name': user.first_name,
             'last_name': user.last_name,
+            'country': str(custom_user.country) if custom_user.country else None,
+            'province': custom_user.province if custom_user.province else None,
+            'nationality': str(custom_user.nationality) if custom_user.nationality else None,
         }
 
         return data
@@ -51,7 +54,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
     role = serializers.CharField(source='role.name')
     first_name = serializers.CharField(source="user.first_name", read_only=True)
     last_name = serializers.CharField(source="user.last_name", read_only=True)
+    country = serializers.SerializerMethodField()
+    nationality = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'dni', 'birth_date', 'read_qr', 'role', 'first_name', 'last_name', 'phones', 'country', 'province', 'nationality']
+        fields = ['id', 'email', 'dni', 'birth_date', 'read_qr', 'role', 'first_name', 'last_name', 'phones', 'country', 'province', 'nationality']
+
+    def get_country(self, obj):
+        return obj.country.code if obj.country else None
+
+    def get_nationality(self, obj):
+        return obj.nationality.code if obj.nationality else None  

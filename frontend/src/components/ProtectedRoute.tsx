@@ -1,10 +1,24 @@
 import { Navigate, Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
-
-const isAuthenticated = true;
+import { useAuthStore } from "@/presentations/auth/store/useAuthStore";
+import { useEffect } from "react";
 
 export default function ProtectedRoute() {
-  return isAuthenticated ? (
+  const { status, checkStatus } = useAuthStore();
+
+  useEffect(() => {
+    checkStatus();
+  }, []);
+
+  if (status === "checking") {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Verificando sesión...
+      </div>
+    );
+  }
+
+  return status === "authenticated" ? (
     <div>
       <Navbar />
       <main className="p-4">
