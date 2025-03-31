@@ -46,8 +46,8 @@ class PersonListSerializer(serializers.ModelSerializer):
 
 
 class PersonDetailSerializer(serializers.ModelSerializer):
-    phones = PhoneSerializer(many=True)
-    company_phones = PhoneSerializer(many=True)
+    phones = PhoneSerializer(many=True, required=False)
+    company_phones = PhoneSerializer(many=True, required=False)
 
     medical_coverage_ids = serializers.PrimaryKeyRelatedField(
         queryset=MedicalCoverage.objects.all(), many=True, write_only=True
@@ -129,12 +129,12 @@ class PersonDetailSerializer(serializers.ModelSerializer):
 
     def validate_dni(self, value):
         if Person.objects.exclude(pk=self.instance.pk if self.instance else None).filter(dni=value).exists():
-            raise serializers.ValidationError("DNI must be unique.")
+            raise serializers.ValidationError("DNI ya está registrado")
         return value
 
     def validate_email(self, value):
         if value and Person.objects.exclude(pk=self.instance.pk if self.instance else None).filter(email=value).exists():
-            raise serializers.ValidationError("Email must be unique.")
+            raise serializers.ValidationError("Este email ya está registrado.")
         return value
 
     def validate_age(self, value):
