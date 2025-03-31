@@ -48,26 +48,33 @@ class PersonListSerializer(serializers.ModelSerializer):
 class PersonDetailSerializer(serializers.ModelSerializer):
     phones = PhoneSerializer(many=True)
     company_phones = PhoneSerializer(many=True)
-    medical_coverage = MedicalCoverageSerializer(many=True, read_only=True)
-    ambulance_service = AmbulanceServiceSerializer(many=True, read_only=True)
 
     medical_coverage_ids = serializers.PrimaryKeyRelatedField(
-        queryset=MedicalCoverage.objects.all(), many=True, write_only=True, source='medical_coverage', required=False
+        queryset=MedicalCoverage.objects.all(), many=True, write_only=True
     )
     ambulance_service_ids = serializers.PrimaryKeyRelatedField(
-        queryset=AmbulanceService.objects.all(), many=True, write_only=True, source='ambulance_service', required=False
+        queryset=AmbulanceService.objects.all(), many=True, write_only=True
     )
 
-    
+    medical_coverage = serializers.SerializerMethodField()
+    ambulance_service = serializers.SerializerMethodField()
+
     class Meta:
         model = Person
         exclude = ['created_by', 'updated_by']
 
+    def get_medical_coverage(self, obj):
+        return MedicalCoverageSerializer(obj.medical_coverage.all(), many=True).data
+
+    def get_ambulance_service(self, obj):
+        return AmbulanceServiceSerializer(obj.ambulance_service.all(), many=True).data
+
+
     def create(self, validated_data):
         phones_data = validated_data.pop('phones', [])
         company_phones_data = validated_data.pop('company_phones', [])
-        medical_coverage_data = validated_data.pop('medical_coverage', [])
-        ambulance_service_data = validated_data.pop('ambulance_service', [])
+        medical_coverage_data = validated_data.pop('medical_coverage_ids', [])
+        ambulance_service_data = validated_data.pop('ambulance_service_ids', [])
 
         person = Person.objects.create(**validated_data)
 
@@ -92,8 +99,8 @@ class PersonDetailSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         phones_data = validated_data.pop('phones', None)
         company_phones_data = validated_data.pop('company_phones', None)
-        medical_coverage_data = validated_data.pop('medical_coverage', None)
-        ambulance_service_data = validated_data.pop('ambulance_service', None)
+        medical_coverage_data = validated_data.pop('medical_coverage_ids', None)
+        ambulance_service_data = validated_data.pop('ambulance_service_ids', None)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)

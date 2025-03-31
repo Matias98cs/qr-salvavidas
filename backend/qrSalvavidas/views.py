@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
-from .models import Person
-from .serializers import PersonListSerializer, PersonDetailSerializer
+from .models import Person, AmbulanceService, MedicalCoverage
+from .serializers import PersonListSerializer, PersonDetailSerializer, AmbulanceServiceSerializer, MedicalCoverageSerializer
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 
@@ -43,3 +43,16 @@ class PersonViewSet(viewsets.ModelViewSet):
         person.delete()
 
         return Response({"detail": "Persona y datos asociados eliminados correctamente."}, status=status.HTTP_204_NO_CONTENT)
+    
+
+class AmbulanceServiceViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = AmbulanceService.objects.all()
+    serializer_class = AmbulanceServiceSerializer
+
+
+
+class MedicalCoverageViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = MedicalCoverage.objects.all()
+    serializer_class = MedicalCoverageSerializer
