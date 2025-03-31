@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django_countries.fields import CountryField  # 🔹 Para manejar países válidos
+from django_countries.fields import CountryField
 
 class Role(models.Model):
     ADMIN = "admin"
@@ -29,8 +29,8 @@ class Phone(models.Model):
     ]
 
     user = models.ForeignKey("CustomUser", on_delete=models.CASCADE, related_name="phones", blank=True, null=True)
-    country_code = models.CharField(max_length=5, blank=True, null=True)  # 🔹 Codigo de país (ejemplo: +54 para Argentina)
-    area_code = models.CharField(max_length=5, blank=True, null=True)  # 🔹 Codigo de area (ejemplo: 351 para Cordoba)
+    country_code = models.CharField(max_length=5, blank=True, null=True)
+    area_code = models.CharField(max_length=5, blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     type = models.CharField(max_length=10, choices=PHONE_TYPE_CHOICES)
 
@@ -49,8 +49,8 @@ class CustomUser(models.Model):
     birth_date = models.DateField(null=True, blank=True)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
     country = CountryField(blank=True, null=True)  # 🔹 Usa django-countries para países válidos
-    province = models.CharField(max_length=100, blank=True, null=True)  # 🔹 Provincia/Estado
-    nationality = CountryField(blank=True, null=True, verbose_name="Nationality")  # 🔹 Nacionalidad del usuario
+    province = models.CharField(max_length=100, blank=True, null=True)
+    nationality = CountryField(blank=True, null=True, verbose_name="Nationality")
     read_qr = models.BooleanField(default=False)
 
     def __str__(self):
