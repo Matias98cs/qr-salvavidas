@@ -1,0 +1,42 @@
+[
+    {
+        "model": "qrSalvavidas.medicalcoverage",
+        "pk": 1,
+        "fields": {
+            "type": "social_security",
+            "name": "PAMI"
+        }
+    },
+    {
+        "model": "qrSalvavidas.medicalcoverage",
+        "pk": 2,
+        "fields": {
+            "type": "social_security",
+            "name": "IOMA"
+        }
+    },
+    {
+        "model": "qrSalvavidas.medicalcoverage",
+        "pk": 3,
+        "fields": {
+            "type": "private",
+            "name": "OSDE"
+        }
+    },
+    {
+        "model": "qrSalvavidas.medicalcoverage",
+        "pk": 4,
+        "fields": {
+            "type": "private",
+            "name": "Swiss Medical"
+        }
+    },
+    {
+        "model": "qrSalvavidas.medicalcoverage",
+        "pk": 5,
+        "fields": {
+            "type": "private",
+            "name": "Galeno"
+        }
+    }
+]
