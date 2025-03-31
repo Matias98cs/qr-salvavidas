@@ -1,17 +1,22 @@
 import { columns } from "@/components/ColumnsPerson";
+import DeletePersonModal from "@/components/DeletePersonModal";
 import { DataTable } from "@/components/PersonsTable";
 import { PersonsList } from "@/interfaces/persons/person.interface";
+import useDeletePerson from "@/presentations/persons/hooks/useDeletePerson";
 import usePersonsList from "@/presentations/persons/hooks/usePersonsList";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function ListPersons() {
   const navigate = useNavigate();
   const { personsList, isLoadingPL, errorPL } = usePersonsList();
+  const { deletePerson } = useDeletePerson();
   const [selectedPerson, setSelectedPerson] = useState<PersonsList | null>(
     null
   );
-  const [isQRModalOpen, setQRModalOpen] = useState(false);
+  // const [isQRModalOpen, setQRModalOpen] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
 
   if (isLoadingPL) {
     return <p>Cargando...</p>;
@@ -22,14 +27,22 @@ function ListPersons() {
   }
 
   const handleOpenQRModal = (person: PersonsList) => {
-    console.log(person);
     setSelectedPerson(person);
-    setQRModalOpen(true);
+    // setQRModalOpen(true);
   };
 
-  const handleCloseQRModal = () => {
-    setSelectedPerson(null);
-    setQRModalOpen(false);
+  const handleOpenDeleteModal = (person: PersonsList) => {
+    setSelectedPerson(person);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = (personId: number) => {
+    deletePerson(personId);
+    toast.success("Persona eliminada correctamente");
+  };
+
+  const handleToEdit = (id: number) => {
+    console.log(`Ir a editar persona: ${id}`);
   };
 
   return (
@@ -46,8 +59,22 @@ function ListPersons() {
         </div>
       )}
       <DataTable
-        columns={columns({ onGenerateQR: handleOpenQRModal })}
+        columns={columns({
+          onGenerateQR: handleOpenQRModal,
+          onDelete: handleOpenDeleteModal,
+          onEdit: handleToEdit,
+        })}
         data={personsList ?? []}
+      />
+
+      <DeletePersonModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={(person) => {
+          handleConfirmDelete(person.id);
+          setDeleteModalOpen(false);
+        }}
+        person={selectedPerson}
       />
     </div>
   );

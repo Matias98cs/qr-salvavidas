@@ -23,7 +23,6 @@ class PersonViewSet(viewsets.ModelViewSet):
         except Person.DoesNotExist:
             raise NotFound("La persona no fue encontrada.")
 
-        return super().get_queryset().get(pk=pk)
     def get_queryset(self):
         show_deleted = self.request.query_params.get("show_deleted", "false").lower() == "true"
         

@@ -37,3 +37,12 @@ export const getPersonList = async (): Promise<PersonsList[]> => {
         throw error;
     }
 }
+
+export const deletePerson = async (id: number): Promise<void> => {
+    try {
+        await https.delete(`/persons/persons/${id}/delete-all/`);
+    } catch (error) {
+        console.error("Error al eliminar la persona:", error);
+        throw error;
+    }
+}

@@ -26,10 +26,12 @@ import { bloodTypesData } from "@/helpers/bloodTypes";
 import { validatePersonForm } from "@/validations/validatePersonForm";
 import { createPerson } from "@/services/persons/person.service";
 import { toast } from "react-toastify";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function LoadPersons() {
   const { ambulanceServices, isLoadingAS } = useAmbulanceServices();
   const { medicalServices, isLoadingMS } = useMedicalServices();
+  const queryClient = useQueryClient();
 
   const [personData, setPersonData] = useState<Person>({
     email: "",
@@ -64,11 +66,8 @@ export default function LoadPersons() {
     setErrors(formErrors);
 
     if (!isValid) {
-      // console.log("Errores en el formulario", formErrors);
       return;
     }
-
-    // console.log("Formulario válido, enviar:", personData);
 
     try {
       await createPerson(personData);
@@ -92,9 +91,9 @@ export default function LoadPersons() {
         medical_coverage_ids: [],
         ambulance_service_ids: [],
       });
+      queryClient.invalidateQueries({ queryKey: ["personsList"] });
       toast.success("Persona creada con éxito!");
     } catch (error) {
-      console.log(error)
       if (typeof error === "object" && error !== null) {
         setErrors(error as Errors);
         toast.error("Error al crear la persona.");

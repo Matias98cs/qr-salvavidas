@@ -11,7 +11,7 @@ import { MoreVertical } from "lucide-react";
 
 interface ColumnsProps {
   onGenerateQR: (person: PersonsList) => void;
-  onEdit?: (person: PersonsList) => void;
+  onEdit?: (id: number) => void;
   onDelete?: (person: PersonsList) => void;
 }
 
@@ -58,7 +58,7 @@ export const columns = ({
           <DropdownMenuContent align="start">
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={() => onEdit?.(person)}
+              onClick={() => onEdit?.(person.id)}
             >
               Editar
             </DropdownMenuItem>
