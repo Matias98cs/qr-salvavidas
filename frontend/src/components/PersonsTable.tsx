@@ -69,21 +69,6 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
           )}
         </TableBody>
       </Table>
-
-      {/* <div className="flex items-center justify-end space-x-2 p-2">
-        <Button
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Anterior
-        </Button>
-        <Button
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Siguiente
-        </Button>
-      </div> */}
     </div>
   );
 }

@@ -65,6 +65,7 @@ class Person(models.Model):
     country = CountryField(blank=True, null=True)
     province = models.CharField(max_length=100, blank=True, null=True)
     nationality = CountryField(blank=True, null=True, verbose_name="Nationality")
+    is_deleted = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="created_persons")
     updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="updated_persons")
 

@@ -55,4 +55,5 @@ export interface PersonsList {
     email:     string;
     retired:   boolean;
     private:   boolean;
+    is_deleted: boolean;
 }

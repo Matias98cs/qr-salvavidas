@@ -51,19 +51,25 @@ export const columns = ({
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => onEdit?.(person)}>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => onEdit?.(person)}
+            >
               Editar
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onGenerateQR(person)}>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => onGenerateQR(person)}
+            >
               Generar QR
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="text-red-600 focus:text-red-600"
+              className="text-red-600 focus:text-red-600 cursor-pointer"
               onClick={() => onDelete?.(person)}
             >
               Eliminar
