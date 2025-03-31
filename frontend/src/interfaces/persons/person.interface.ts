@@ -46,3 +46,13 @@ export interface bloodTypes {
     name: string;
     value: string;
 }
+
+export interface PersonsList {
+    id:        number;
+    name:      string;
+    last_name: string;
+    dni:       string;
+    email:     string;
+    retired:   boolean;
+    private:   boolean;
+}

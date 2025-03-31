@@ -1,5 +1,5 @@
 import { https } from "@/config/axios.api";
-import { Person } from "@/interfaces/persons/person.interface";
+import { Person, PersonsList } from "@/interfaces/persons/person.interface";
 import { AxiosError } from "axios";
 
 type ServerError = Record<string, string[]>;
@@ -27,3 +27,13 @@ export const createPerson = async (data: Person): Promise<Person> => {
         throw new Error("Error de conexión con el servidor.");
     }
 };
+
+export const getPersonList = async (): Promise<PersonsList[]> => {
+    try {
+        const response = await https.get<PersonsList[]>("/persons/persons/");
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener la lista de personas:", error);
+        throw error;
+    }
+}
