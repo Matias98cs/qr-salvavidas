@@ -1,7 +1,8 @@
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
 from users.models import CustomUser, Phone, Role
-
+from django_countries.fields import CountryField
 
 class QRData(models.Model):
     person = models.OneToOneField("Person", on_delete=models.CASCADE, related_name="qr_data", null=True)
@@ -42,10 +43,12 @@ class Person(models.Model):
         ("AB+", "AB+"), ("AB-", "AB-"), ("O+", "O+"), ("O-", "O-")
     ]
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    last_name = models.CharField(max_length=255, blank=True, null=True)
     dni = models.CharField(max_length=20, unique=True)
-    age = models.PositiveSmallIntegerField()
-    personal_phone = models.CharField(max_length=20)
+    age = models.PositiveSmallIntegerField(blank=True, null=True)
+    birth_date = models.DateField(null=True, blank=True)
+    personal_phone = models.CharField(max_length=20, unique=True, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     phones = models.ManyToManyField(Phone, blank=True)
     company_phones = models.ManyToManyField(Phone, related_name="company_phones", blank=True)
@@ -59,8 +62,21 @@ class Person(models.Model):
     patient_status = models.CharField(max_length=255, blank=True, null=True)
     organ_donor = models.BooleanField(default=False)
     private = models.BooleanField(default=False)
+    country = CountryField(blank=True, null=True)
+    province = models.CharField(max_length=100, blank=True, null=True)
+    nationality = CountryField(blank=True, null=True, verbose_name="Nationality")
+    is_deleted = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="created_persons")
     updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="updated_persons")
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        if self.birth_date:
+            today = timezone.now().date()
+            age = today.year - self.birth_date.year - (
+                (today.month, today.day) < (self.birth_date.month, self.birth_date.day)
+            )
+            self.age = age
+        super().save(*args, **kwargs)
