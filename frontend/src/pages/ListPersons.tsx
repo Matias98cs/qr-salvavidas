@@ -1,9 +1,11 @@
 import { columns } from "@/components/ColumnsPerson";
 import DeletePersonModal from "@/components/DeletePersonModal";
 import { DataTable } from "@/components/PersonsTable";
+import { Button } from "@/components/ui/button";
 import { PersonsList } from "@/interfaces/persons/person.interface";
 import useDeletePerson from "@/presentations/persons/hooks/useDeletePerson";
 import usePersonsList from "@/presentations/persons/hooks/usePersonsList";
+import { Label } from "@radix-ui/react-dropdown-menu";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -48,24 +50,28 @@ function ListPersons() {
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-2xl font-bold mb-6">Personas Registradas</h1>
-      {personsList && personsList.length < 0 && (
-        <div className="flex justify-end mb-6">
-          <button
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+      {personsList?.length === 0 ? (
+        <div className="flex justify-center items-center flex-col pt-10 gap-4">
+          <Label>
+            No hay personas registradas. Agregue una persona utilizando el botón de abajo.
+          </Label>
+          <Button
+            className="w-1/2 hover:text-gray-300 cursor-pointer"
             onClick={() => navigate("/carga")}
           >
             Agregar Persona
-          </button>
+          </Button>
         </div>
+      ) : (
+        <DataTable
+          columns={columns({
+            onGenerateQR: handleOpenQRModal,
+            onDelete: handleOpenDeleteModal,
+            onEdit: handleToEdit,
+          })}
+          data={personsList ?? []}
+        />
       )}
-      <DataTable
-        columns={columns({
-          onGenerateQR: handleOpenQRModal,
-          onDelete: handleOpenDeleteModal,
-          onEdit: handleToEdit,
-        })}
-        data={personsList ?? []}
-      />
 
       <DeletePersonModal
         isOpen={isDeleteModalOpen}
