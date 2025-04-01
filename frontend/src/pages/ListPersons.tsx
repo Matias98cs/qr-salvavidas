@@ -44,7 +44,7 @@ function ListPersons() {
   };
 
   const handleToEdit = (id: number) => {
-    console.log(`Ir a editar persona: ${id}`);
+    navigate(`/editar/${id}`);
   };
 
   return (

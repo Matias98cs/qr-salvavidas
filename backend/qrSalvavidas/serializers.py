@@ -48,6 +48,7 @@ class PersonListSerializer(serializers.ModelSerializer):
 class PersonDetailSerializer(serializers.ModelSerializer):
     phones = PhoneSerializer(many=True, required=False)
     company_phones = PhoneSerializer(many=True, required=False)
+    age = serializers.IntegerField(read_only=True)
 
     medical_coverage_ids = serializers.PrimaryKeyRelatedField(
         queryset=MedicalCoverage.objects.all(), many=True, write_only=True
@@ -139,6 +140,6 @@ class PersonDetailSerializer(serializers.ModelSerializer):
 
     def validate_age(self, value):
         if value < 1:
-            raise serializers.ValidationError("Age must be at least 1.")
+            raise serializers.ValidationError("Edad inválida. Debe ser un número entero positivo.")
         return value
 

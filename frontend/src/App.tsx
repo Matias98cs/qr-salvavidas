@@ -11,7 +11,8 @@ const Login = lazy(() => import("./pages/Login"));
 const Configurations = lazy(() => import("./pages/Configurations"));
 const ListPersons = lazy(() => import("./pages/ListPersons"));
 const LoadPersons = lazy(() => import("./pages/LoadPersons"));
-const NotFound = lazy(() => import("./pages/NotFound")); // Nueva página 404
+const EditPerson = lazy(() => import("./pages/EditPerson"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ export default function App() {
               <Route path="/configuracion" element={<Configurations />} />
               <Route path="/lista" element={<ListPersons />} />
               <Route path="/carga" element={<LoadPersons />} />
+              <Route path="/editar/:id" element={<EditPerson />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

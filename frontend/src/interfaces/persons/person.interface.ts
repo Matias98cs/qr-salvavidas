@@ -1,6 +1,7 @@
 import { Phone } from "../auth.interface";
 
 export interface Person {
+    id?:                    number;
     name:                  string;
     last_name:             string;
     dni:                   string;
@@ -12,6 +13,8 @@ export interface Person {
     company_phones?:        Phone[];
     medical_coverage_ids:  number[];
     ambulance_service_ids: number[];
+    medical_coverage?:      MedicalCoverage[];
+    ambulance_service?:    AmbulanceService[];
     retired:               boolean;
     country:               string;
     nationality:           string;
