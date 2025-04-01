@@ -1,5 +1,5 @@
 import { https } from "@/config/axios.api";
-import { Person, PersonsList } from "@/interfaces/persons/person.interface";
+import { GenerateQR, Person, PersonsList } from "@/interfaces/persons/person.interface";
 import { AxiosError } from "axios";
 
 type ServerError = Record<string, string[]>;
@@ -77,5 +77,15 @@ export const updatePerson = async (id: number, data: Partial<Person>): Promise<P
         }
 
         throw new Error("Error de conexión con el servidor.");
+    }
+}
+
+export const generateQRPerson = async (id: number): Promise<GenerateQR> => {
+    try {
+        const response = await https.get<GenerateQR>(`/persons/persons/${id}/generate-qr/`);
+        return response.data;
+    } catch (error) {
+        console.error("Error al generar el código QR:", error);
+        throw error;
     }
 }

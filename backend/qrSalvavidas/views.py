@@ -1,10 +1,13 @@
 from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
-from .models import Person, AmbulanceService, MedicalCoverage
+from .models import Person, AmbulanceService, MedicalCoverage, QRData
 from .serializers import PersonListSerializer, PersonDetailSerializer, AmbulanceServiceSerializer, MedicalCoverageSerializer
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.exceptions import NotFound
+import qrcode
+import io
+import base64
 
 class PersonViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -74,6 +77,26 @@ class PersonViewSet(viewsets.ModelViewSet):
         person.save()
 
         return Response({"detail": "Persona activada correctamente."}, status=status.HTTP_200_OK)
+    
+
+    @action(detail=True, methods=["get"], url_path="generate-qr")
+    def generate_qr(self, request, pk=None):
+        person = self.get_object()
+        data = {"person_id": person.id}
+
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(data)
+        qr.make(fit=True)
+
+        img = qr.make_image(fill_color="black", back_color="white")
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+        image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+
+        return Response({
+            "detail": "QR generado correctamente.",
+            "qr_image_base64": f"data:image/png;base64,{image_base64}",
+        })
 
 class AmbulanceServiceViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]

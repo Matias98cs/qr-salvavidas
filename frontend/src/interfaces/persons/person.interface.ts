@@ -60,3 +60,8 @@ export interface PersonsList {
     private:   boolean;
     is_deleted: boolean;
 }
+
+export interface GenerateQR {
+    detail:          string;
+    qr_image_base64: string;
+}
