@@ -5,6 +5,7 @@ from .serializers import PersonListSerializer, PersonDetailSerializer, Ambulance
 from rest_framework.decorators import action, api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.exceptions import NotFound
+from PIL import Image, ImageEnhance
 import qrcode
 import io
 import base64
@@ -88,13 +89,31 @@ class PersonViewSet(viewsets.ModelViewSet):
         qr.add_data(data)
         qr.make(fit=True)
 
-        img = qr.make_image(fill_color="black", back_color="white")
+        qr_img = qr.make_image(fill_color="black", back_color="white").convert("RGBA")
+
+        logo = Image.open("static/logo-sinfondo.png").convert("RGBA")
+        qr_width, qr_height = qr_img.size
+
+        logo_size = int(qr_width * 0.8)
+        logo = logo.resize((logo_size, logo_size))
+
+        alpha = logo.split()[3]
+        alpha = ImageEnhance.Brightness(alpha).enhance(0.3)  # 0.5 = 50% de opacidad
+        logo.putalpha(alpha)
+
+        pos = (
+            (qr_width - logo_size) // 2,
+            (qr_height - logo_size) // 2,
+        )
+
+        qr_img.paste(logo, pos, mask=logo)
+
         buffer = io.BytesIO()
-        img.save(buffer, format="PNG")
-        image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        qr_img.save(buffer, format="PNG")
+        image_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
         return Response({
-            "detail": "QR generado correctamente.",
+            "detail": "QR generado con logo transparente.",
             "qr_image_base64": f"data:image/png;base64,{image_base64}",
         })
 
