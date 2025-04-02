@@ -3,8 +3,7 @@ from rest_framework.response import Response
 from .models import Person, AmbulanceService, MedicalCoverage, QRData
 from .serializers import PersonListSerializer, PersonDetailSerializer, AmbulanceServiceSerializer, MedicalCoverageSerializer
 from rest_framework.decorators import action, api_view
-from rest_framework.exceptions import ValidationError
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import ValidationError, NotFound, PermissionDenied
 from PIL import Image, ImageEnhance
 import qrcode
 import io
@@ -49,10 +48,38 @@ class PersonViewSet(viewsets.ModelViewSet):
 
     def _check_user_data_complete(self):
         user = self.request.user
-        required_fields = ['first_name', 'last_name', 'email']
-        missing = [field for field in required_fields if not getattr(user, field)]
+        custom_user = getattr(user, 'customuser', None)
+
+        required_user_fields = ['first_name', 'last_name']
+        required_custom_fields = ['email', 'dni', 'birth_date', 'country', 'nationality', 'province']
+
+        field_labels = {
+            'first_name': 'Nombre',
+            'last_name': 'Apellido',
+            'email': 'Email',
+            'dni': 'DNI',
+            'birth_date': 'Fecha de nacimiento',
+            'country': 'País',
+            'nationality': 'Nacionalidad',
+            'province': 'Provincia',
+        }
+
+        missing = []
+
+        for field in required_user_fields:
+            if not getattr(user, field):
+                missing.append(field)
+
+        if custom_user:
+            for field in required_custom_fields:
+                if not getattr(custom_user, field):
+                    missing.append(field)
+        else:
+            missing.extend(required_custom_fields)
+
         if missing:
-            raise PermissionError(f"Your user profile is incomplete. Missing: {', '.join(missing)}")
+            missing_fields_labels = [field_labels.get(field, field) for field in missing]
+            raise PermissionDenied(f"Tu perfil está incompleto. Faltan: {', '.join(missing_fields_labels)}.")
 
     @action(detail=True, methods=["delete"], url_path="delete-all")
     def delete_all(self, request, pk=None):

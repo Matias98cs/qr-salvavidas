@@ -54,6 +54,7 @@ export default function LoadPersons() {
     ambulance_service_ids: [],
   });
   const [errors, setErrors] = useState<Errors>({});
+  const [generalError, setGeneralError] = useState<string | null>(null);
 
   if (isLoadingAS || isLoadingMS) {
     return <div className="text-center pt-10">Cargando...</div>;
@@ -95,6 +96,11 @@ export default function LoadPersons() {
       toast.success("Persona creada con éxito!");
     } catch (error) {
       if (typeof error === "object" && error !== null) {
+        if ("detail" in error && typeof error.detail === "string") {
+          setGeneralError(error.detail);
+          toast.error("Error: tu perfil está incompleto.");
+          return;
+        }
         setErrors(error as Errors);
         toast.error("Error al crear la persona.");
       } else {
@@ -102,6 +108,7 @@ export default function LoadPersons() {
       }
     }
   };
+
   return (
     <div className="container mx-auto py-10 px-4">
       <Card className="max-w-4xl mx-auto">
@@ -110,6 +117,13 @@ export default function LoadPersons() {
           <CardDescription>Creacion</CardDescription>
         </CardHeader>
         <CardContent>
+          {
+            generalError && (
+              <div className="py-5">
+                <p className="text-red-500 text-base font-bold">{generalError}</p>
+              </div>
+            )
+          }
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">

@@ -12,7 +12,6 @@ export const createPerson = async (data: Person): Promise<Person> => {
         return response.data;
     } catch (error) {
         const axiosError = error as AxiosError<ServerError>;
-
         if (axiosError.response?.status === 400 && axiosError.response.data) {
             const rawErrors = axiosError.response.data;
             const parsedErrors: Record<string, string> = {};
@@ -22,6 +21,11 @@ export const createPerson = async (data: Person): Promise<Person> => {
             });
 
             throw parsedErrors;
+        }
+
+        if (axiosError.response?.status === 403 && axiosError.response.data) {
+            const rawErrors = axiosError.response.data;
+            throw rawErrors;
         }
 
         throw new Error("Error de conexión con el servidor.");
