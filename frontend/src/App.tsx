@@ -12,6 +12,7 @@ const Configurations = lazy(() => import("./pages/Configurations"));
 const ListPersons = lazy(() => import("./pages/ListPersons"));
 const LoadPersons = lazy(() => import("./pages/LoadPersons"));
 const EditPerson = lazy(() => import("./pages/EditPerson"));
+const ReadQR = lazy(() => import("./pages/ReadQR"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ export default function App() {
               <Route path="/editar/:id" element={<EditPerson />} />
             </Route>
 
+            <Route path="/leer-qr/:persona_id" element={<ReadQR />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
@@ -49,7 +51,6 @@ export default function App() {
           draggable
           pauseOnHover
           theme="dark"
-          // transition={Bounce}
         />
       </Router>
     </QueryClientProvider>

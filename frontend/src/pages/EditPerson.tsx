@@ -12,7 +12,9 @@ import { toast } from "react-toastify";
 
 export default function EditPerson() {
   const { id } = useParams<{ id: string }>();
-  const { personData, isLoadingPD, errorPD } = usePersonById(Number(id));
+  const { personData, isLoadingPD, errorPD, isErrorPD } = usePersonById(
+    Number(id)
+  );
   const [formData, setFormData] = useState<Person | null>(null);
   const [errors, setErrors] = useState<Errors>({});
   const queryClient = useQueryClient();
@@ -32,8 +34,19 @@ export default function EditPerson() {
   if (isLoadingPD) {
     return <Loading />;
   }
-  if (errorPD) {
-    return <p>Error al cargar la persona: {errorPD}</p>;
+  if (isErrorPD) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+        <p>{(errorPD as Error).message}</p>
+      </div>
+    );
+  }
+  if (isErrorPD) {
+    return (
+      <p className="text-center text-red-500">
+        Ocurrió un error al cargar los datos.
+      </p>
+    );
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,7 +71,7 @@ export default function EditPerson() {
         toast.success("Persona actualizada con éxito!");
       } catch (error) {
         if (typeof error === "object" && error !== null) {
-            console.log(error)
+          console.log(error);
           setErrors(error as Errors);
           toast.error("Error al actualizar la persona.");
         } else {

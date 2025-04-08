@@ -51,15 +51,24 @@ export const deletePerson = async (id: number): Promise<void> => {
     }
 }
 
+
+type DetailError = { detail: string };
+
 export const getPersonById = async (id: number): Promise<Person> => {
     try {
         const response = await https.get<Person>(`/persons/persons/${id}/`);
         return response.data;
     } catch (error) {
-        console.error("Error al obtener la persona:", error);
-        throw error;
+        const axiosError = error as AxiosError<DetailError>;
+        console.log(axiosError)
+        if (axiosError.response?.status === 404 && axiosError.response.data) {
+            const detail = axiosError.response.data.detail || "Persona no encontrada";
+            throw new Error(detail);
+          }
+
+        throw new Error("Ocurrió un error al obtener los datos de la persona.");
     }
-}
+};
 
 
 export const updatePerson = async (id: number, data: Partial<Person>): Promise<Person> => {
