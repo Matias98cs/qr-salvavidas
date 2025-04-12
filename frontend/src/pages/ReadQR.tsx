@@ -17,6 +17,8 @@ import usePersonById from "@/presentations/persons/hooks/usePersonById";
 import Loading from "@/components/Loading";
 import { Person } from "@/interfaces/persons/person.interface";
 import PersonInfoCard from "@/components/PersonInfoCard";
+import { getErrorMessage } from "@/helpers/loginError";
+import FullscreenLoading from "@/components/FullscreenLoading";
 function ReadQR() {
   const { status, login } = useAuthStore();
   const { persona_id } = useParams();
@@ -24,7 +26,7 @@ function ReadQR() {
     Number(persona_id)
   );
   const [person, setPerson] = useState<Person | null>(null);
-
+  const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     emailOrUsername: "",
@@ -73,24 +75,26 @@ function ReadQR() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setLoading(true);
     if (!formData.emailOrUsername || !formData.password) {
       alert("Todos los campos son obligatorios");
       return;
     }
 
     try {
-      const response = await login(formData.emailOrUsername, formData.password);
-      console.log(response)
+      await login(formData.emailOrUsername, formData.password);
       toast.success("Sesión iniciada correctamente!");
-    } catch (error) {
-      console.log(error);
-      toast.error("Error al iniciar sesión: ");
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+      {loading && <FullscreenLoading />}
       {status === "authenticated" ? (
         person && <PersonInfoCard person={person} />
       ) : (

@@ -45,10 +45,9 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         try {
             const response: AuthResponse = await authLogin(email, password);
             get().changeStatus(response.access, response.user);
-            return true;
+            return { success: true, message: "Sesión iniciada correctamente!" };
         } catch (error) {
-            console.error("Error en login:", error);
-            return false;
+            throw { success: false, message: error };
         }
     },
 

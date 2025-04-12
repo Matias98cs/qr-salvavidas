@@ -12,12 +12,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-// import { authLogin } from "@/services/auth/auth.service";
 import { useAuthStore } from "@/presentations/auth/store/useAuthStore";
+import FullscreenLoading from "@/components/FullscreenLoading";
+import { toast } from "react-toastify";
+import { getErrorMessage } from "@/helpers/loginError";
 
 export default function Login() {
   const { login } = useAuthStore();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     emailOrUsername: "",
@@ -30,6 +33,7 @@ export default function Login() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    setLoading(true);
     e.preventDefault();
 
     if (!formData.emailOrUsername || !formData.password) {
@@ -39,9 +43,13 @@ export default function Login() {
 
     try {
       await login(formData.emailOrUsername, formData.password);
+      toast.success("Sesión iniciada correctamente!");
       navigate("/");
-    } catch (error) {
-      alert("Error al iniciar sesión: " + error);
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,6 +59,7 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+      {loading && <FullscreenLoading />}
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
@@ -107,11 +116,6 @@ export default function Login() {
               Iniciar Sesión
             </Button>
           </form>
-          {/* <div className="mt-4 text-center text-sm">
-            <a href="#" className="text-primary hover:underline">
-              ¿Olvidaste tu contraseña?
-            </a>
-          </div> */}
         </CardContent>
       </Card>
     </div>

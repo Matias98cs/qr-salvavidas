@@ -18,9 +18,7 @@ export const authLogin = async (username: string, password: string): Promise<Aut
         return data;
     } catch (error) {
         const axiosError = error as AxiosError<{ detail?: string }>;
-
         const errorMessage = axiosError.response?.data?.detail || "Error de conexión con el servidor.";
-
         throw new Error(errorMessage);
     }
 };
