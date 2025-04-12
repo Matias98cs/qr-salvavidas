@@ -9,6 +9,9 @@ import qrcode
 import io
 import base64
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class PersonViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -116,7 +119,7 @@ class PersonViewSet(viewsets.ModelViewSet):
         if not URL_FRONT:
             raise ValidationError("No se ha configurado la URL del frontend.")
         
-        link = f"{URL_FRONT}/persons/persons/read-qr/?persona_id={person.id}"
+        link = f"{URL_FRONT}/leer-qr/{person.id}"
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(link)
         qr.make(fit=True)
