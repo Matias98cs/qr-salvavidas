@@ -25,10 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-8e78^z+^of1cuexb@-dp1-f*!(_@q2z80ov#vjd@_u98u!5jk@'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'changemeplease')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(int(os.environ.get('DEBUG', 0)))
 
 ALLOWED_HOSTS = ["*"]
 
@@ -92,16 +92,41 @@ WSGI_APPLICATION = 'myproyect.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': os.getenv('POSTGRES_PORT'),
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('POSTGRES_DB'),
+#         'USER': os.getenv('POSTGRES_USER'),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+#         'HOST': os.getenv('POSTGRES_HOST'),
+#         'PORT': os.getenv('POSTGRES_PORT'),
+#     }
+# }
+
+if DEBUG:
+   DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'HOST': os.environ.get('PROD_DB_HOST'),
+            'NAME': os.environ.get('PROD_DB_NAME'),
+            'USER': os.environ.get('PROD_DB_USER'),
+            'PASSWORD': os.environ.get('PROD_DB_PASSWORD'),
+            'PORT': os.environ.get('PROD_DB_PORT'),
+        }
     }
-}
+
+# PRODUCCION
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'qrsalvavidas',
+            'USER': 'admin',
+            'PASSWORD': 'admin',
+            'HOST': 'localhost',  
+            'PORT': '5434',
+        }
+    }
 
 
 # Password validation
