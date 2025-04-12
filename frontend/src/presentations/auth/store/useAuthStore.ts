@@ -11,7 +11,10 @@ interface AuthState {
     password?: string;
     userProfile: AuthProfileResponse | null;
 
-    login: (email: string, password: string) => Promise<boolean>;
+    login: (email: string, password: string) => Promise<{
+        success: boolean;
+        message?: string;
+    }>;
     logout: () => Promise<void>;
     checkStatus: () => Promise<void>;
     changeStatus: (token?: string, user?: User) => void;
@@ -42,10 +45,9 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         try {
             const response: AuthResponse = await authLogin(email, password);
             get().changeStatus(response.access, response.user);
-            return true;
+            return { success: true, message: "Sesión iniciada correctamente!" };
         } catch (error) {
-            console.error("Error en login:", error);
-            return false;
+            throw { success: false, message: error };
         }
     },
 

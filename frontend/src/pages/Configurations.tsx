@@ -26,6 +26,8 @@ import useAuthProfile from "@/presentations/auth/hooks/useAuthProfile";
 import { useAuthStore } from "@/presentations/auth/store/useAuthStore";
 import { Phone } from "@/interfaces/auth.interface";
 import { authChangeProfileData } from "@/services/auth/auth.service";
+import FullscreenLoading from "@/components/FullscreenLoading";
+import { toast } from "react-toastify";
 
 export default function Configurations() {
   const { userProfile, setProfile } = useAuthStore();
@@ -44,8 +46,8 @@ export default function Configurations() {
   });
 
   const [phones, setPhones] = useState<Phone[]>(userProfile?.phones ?? []);
-
   const [errors, setErrors] = useState<Errors>({});
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     if (userProfileQuery) {
@@ -127,46 +129,47 @@ export default function Configurations() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+    setIsSubmitting(true);
+
     const newErrors: Errors = {};
-  
+
     if (!userData.email || !userData.email.includes("@")) {
       newErrors.email = "Email inválido";
     }
-  
+
     if (!userData.dni || userData.dni.length < 7) {
       newErrors.dni = "DNI inválido";
     }
-  
+
     if (!userData.first_name) {
       newErrors.first_name = "Nombre requerido";
     }
-  
+
     if (!userData.last_name) {
       newErrors.last_name = "Apellido requerido";
     }
-  
+
     setErrors(newErrors);
-  
 
     if (Object.keys(newErrors).length === 0) {
       try {
         await authChangeProfileData({ ...userData, phones });
-        alert("Datos guardados correctamente");
+        toast.success("Perfil actualizado correctamente.");
       } catch (error) {
-  
         if (error && typeof error === "object" && "errors" in error) {
           setErrors(error.errors as Errors);
         } else {
-          alert("Ocurrió un error desconocido al actualizar el perfil.");
+          toast.error("Error al actualizar el perfil.");
         }
+      } finally {
+        setIsSubmitting(false);
       }
     }
   };
 
-
   return (
     <div className="container mx-auto py-10 px-4">
+      {isSubmitting && <FullscreenLoading />}
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl">Configuración de Usuario</CardTitle>
@@ -364,12 +367,9 @@ export default function Configurations() {
               </div>
               <Separator />
 
-              {
-                errors.phones && (
-                  <p className="text-red-500 text-sm">{errors.phones}</p>
-
-                )
-              }
+              {errors.phones && (
+                <p className="text-red-500 text-sm">{errors.phones}</p>
+              )}
 
               {phones.length > 0 ? (
                 phones.map((phone, index) => (

@@ -27,6 +27,7 @@ import { validatePersonForm } from "@/validations/validatePersonForm";
 import { createPerson } from "@/services/persons/person.service";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
+import FullscreenLoading from "@/components/FullscreenLoading";
 
 export default function LoadPersons() {
   const { ambulanceServices, isLoadingAS } = useAmbulanceServices();
@@ -55,12 +56,14 @@ export default function LoadPersons() {
   });
   const [errors, setErrors] = useState<Errors>({});
   const [generalError, setGeneralError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   if (isLoadingAS || isLoadingMS) {
     return <div className="text-center pt-10">Cargando...</div>;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
+    setIsSubmitting(true);
     e.preventDefault();
 
     const { isValid, errors: formErrors } = validatePersonForm(personData);
@@ -106,24 +109,25 @@ export default function LoadPersons() {
       } else {
         toast.error("Ocurrió un error desconocido al crear la persona.");
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="container mx-auto py-10 px-4">
+      {isSubmitting && <FullscreenLoading />}
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl">Carga de personas</CardTitle>
           <CardDescription>Creacion</CardDescription>
         </CardHeader>
         <CardContent>
-          {
-            generalError && (
-              <div className="py-5">
-                <p className="text-red-500 text-base font-bold">{generalError}</p>
-              </div>
-            )
-          }
+          {generalError && (
+            <div className="py-5">
+              <p className="text-red-500 text-base font-bold">{generalError}</p>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">

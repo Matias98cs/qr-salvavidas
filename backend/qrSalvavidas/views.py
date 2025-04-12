@@ -8,6 +8,7 @@ from PIL import Image, ImageEnhance
 import qrcode
 import io
 import base64
+import os
 
 class PersonViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -110,39 +111,42 @@ class PersonViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["get"], url_path="generate-qr")
     def generate_qr(self, request, pk=None):
         person = self.get_object()
-        data = {"person_id": person.id}
+        URL_FRONT = os.getenv("URL_FRONT")
 
+        if not URL_FRONT:
+            raise ValidationError("No se ha configurado la URL del frontend.")
+        
+        link = f"{URL_FRONT}/persons/persons/read-qr/?persona_id={person.id}"
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
-        qr.add_data(data)
+        qr.add_data(link)
         qr.make(fit=True)
 
-        qr_img = qr.make_image(fill_color="black", back_color="white").convert("RGBA")
-
-        logo = Image.open("static/logo-sinfondo.png").convert("RGBA")
-        qr_width, qr_height = qr_img.size
-
-        logo_size = int(qr_width * 0.8)
-        logo = logo.resize((logo_size, logo_size))
-
-        alpha = logo.split()[3]
-        alpha = ImageEnhance.Brightness(alpha).enhance(0.3)  # 0.5 = 50% de opacidad
-        logo.putalpha(alpha)
-
-        pos = (
-            (qr_width - logo_size) // 2,
-            (qr_height - logo_size) // 2,
-        )
-
-        qr_img.paste(logo, pos, mask=logo)
-
+        qr_img = qr.make_image(fill_color="black", back_color="transparent").convert("RGBA")
+        
         buffer = io.BytesIO()
         qr_img.save(buffer, format="PNG")
         image_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
         return Response({
-            "detail": "QR generado con logo transparente.",
+            "detail": "QR generado sin imagen de fondo, solo QR limpio.",
             "qr_image_base64": f"data:image/png;base64,{image_base64}",
         })
+        
+    @action(detail=False, methods=["get"], url_path="read-qr")
+    def read_qr(self, request, pk=None):
+        persona_id = request.query_params.get("persona_id")
+
+        if not persona_id:
+            raise ValidationError("Debes proporcionar el ID de la persona.")
+
+        try:
+            person = Person.objects.get(pk=persona_id)
+            serializer = PersonDetailSerializer(person).data
+
+            return Response(serializer)
+        except Person.DoesNotExist:
+            return Response({"detail": "Persona no encontrada."}, status=status.HTTP_404_NOT_FOUND)
+
 
 class AmbulanceServiceViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]

@@ -6,18 +6,17 @@ import { useQuery } from "@tanstack/react-query";
 const usePersonById = (id: number) => {
     const { status } = useAuthStore();
 
-    const { data, isLoading, isError } = useQuery<Person, Error>({
+    const { data, isLoading, isError, error } = useQuery<Person, Error>({
         queryKey: ["personById", id],
         queryFn: () => getPersonById(id),
-        // refetchInterval: 10000,
-        // refetchOnWindowFocus: false,
         enabled: !!id && status === "authenticated"
     });
 
     return {
         personData: data,
         isLoadingPD: isLoading,
-        errorPD: isError,
+        isErrorPD: isError,
+        errorPD: error,
     };
 
 }
