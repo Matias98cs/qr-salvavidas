@@ -441,9 +441,7 @@ export function FormEditPerson({
               <Textarea
                 id="medication_allergies"
                 name="medication_allergies"
-                placeholder="
-                Ingrese los medicamentos que son alergicos a este paciente.
-              "
+                placeholder="Ingrese los medicamentos que son alergicos a este paciente."
                 value={personData.medication_allergies ?? ""}
                 onChange={(e) => {
                   setPersonData({
@@ -469,9 +467,7 @@ export function FormEditPerson({
               <Textarea
                 id="takes_medication"
                 name="takes_medication"
-                placeholder="
-                Ingrese los medicamentos que toma este paciente.
-              "
+                placeholder="Ingrese los medicamentos que toma este paciente."
                 value={personData.takes_medication ?? ""}
                 onChange={(e) => {
                   setPersonData({
@@ -497,9 +493,7 @@ export function FormEditPerson({
               <Textarea
                 id="medical_history"
                 name="medical_history"
-                placeholder="
-                Ingrese los medicamentos que toma este paciente.
-              "
+                placeholder="Ingrese los medicamentos que toma este paciente."
                 value={personData.medical_history ?? ""}
                 onChange={(e) => {
                   setPersonData({
