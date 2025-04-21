@@ -199,6 +199,67 @@ export function FormEditPerson({
             </div>
 
             <div className="space-y-2">
+              <Label>Hospital (donde se atiende)</Label>
+              <Input
+                id="hospital"
+                name="hospital"
+                value={personData.hospital ?? ""}
+                onChange={(e) => {
+                  setPersonData({ ...personData, hospital: e.target.value });
+                  setErrors({
+                    ...errors,
+                    hospital: "",
+                  });
+                }}
+                className={errors.hospital ? "border-red-500" : ""}
+              />
+              {errors.hospital && (
+                <p className="text-red-500 text-sm">{errors.hospital}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>Contacto de emergencia</Label>
+              <Input
+                id="emergency_contact_phone"
+                name="emergency_contact_phone"
+                type="number"
+                value={personData.emergency_contact_phone ?? ""}
+                onChange={(e) => {
+                  setPersonData({ ...personData, emergency_contact_phone: Number(e.target.value) });
+                  setErrors({
+                    ...errors,
+                    emergency_contact_phone: "",
+                  });
+                }}
+                className={errors.emergency_contact_phone ? "border-red-500" : ""}
+              />
+              {errors.emergency_contact_phone && (
+                <p className="text-red-500 text-sm">{errors.emergency_contact_phone}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>Número de afiliado/plan</Label>
+              <Input
+                id="insurance_plan"
+                name="insurance_plan"
+                value={personData.insurance_plan ?? ""}
+                onChange={(e) => {
+                  setPersonData({ ...personData, insurance_plan: e.target.value });
+                  setErrors({
+                    ...errors,
+                    insurance_plan: "",
+                  });
+                }}
+                className={errors.insurance_plan ? "border-red-500" : ""}
+              />
+              {errors.insurance_plan && (
+                <p className="text-red-500 text-sm">{errors.insurance_plan}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
               <Label>Servicio de ambulancia</Label>
               <Select
                 value={personData.ambulance_service_ids[0]?.toString() ?? ""}

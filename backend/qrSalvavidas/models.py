@@ -68,6 +68,9 @@ class Person(models.Model):
     is_deleted = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="created_persons")
     updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="updated_persons")
+    hospital = models.CharField(max_length=255, blank=True, null=True, verbose_name="Hospital donde se atiende")
+    emergency_contact_phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Teléfono de urgencia")
+    insurance_plan = models.CharField(max_length=255, blank=True, null=True, verbose_name="N° de afiliado y plan", unique=True)
 
     def __str__(self):
         return self.name

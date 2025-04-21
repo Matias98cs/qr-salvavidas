@@ -26,6 +26,9 @@ export interface Person {
     patient_status?:        string;
     organ_donor:           boolean;
     private:               boolean;
+    hospital:              string | null;
+    emergency_contact_phone: number | null;
+    insurance_plan:        string | null;
 }
 
 
